@@ -199,7 +199,7 @@ function chooseBackground() {
 }
 
 function intro() {
-  say('Day 1', `It is ${dateStr(0)}. Todd is standing in his yard staring at a power line. It hums. It is <i>judging</i> him.<br><br>
+  say('Day 1', `It is ${dateStr(0)}. Todd is leaning against his black Jeep Gladiator, staring at a power line. It hums. It is <i>judging</i> him.<br><br>
 Todd's ham radio buddy Matt has heard "chatter." Todd's gut agrees. In <b>14 days</b>, Todd believes, the grid will go down — and when it does, the whole town will head for the one place in St. Augustine with industrial generators, hot coffee and an endless supply of hoagies:<br><br>
 <span class="hl">THE WAWA ON US-1.</span><br><br>
 Each day, choose one thing to do. Prep wisely. And never, ever run out of white cake.`, prepHub, 'Begin prepping');
@@ -216,7 +216,7 @@ const PREP_FLAVOR = [
   'Todd watches a 3-hour YouTube video titled "Grid Down: Day One (Florida Edition)." He takes notes.',
   'Todd tells the mail carrier to "stay safe out there." The mail carrier is confused.',
   'Todd re-labels every jug in the garage with the date and his initials. Twice.',
-  'A peacock is standing on Todd\'s truck. Todd takes it as an omen.',
+  'A peacock is standing on Todd\'s Jeep Gladiator. Todd takes it as an omen.',
 ];
 
 function prepHub() {
@@ -309,7 +309,7 @@ const STORES = {
       { k: 'panels', label: 'Solar panel', price: 150, step: 1 },
       { k: 'batteries', label: 'Battery bank', price: 120, step: 1 },
       { k: 'gas', label: 'Gas (gallon, with can)', price: 5, step: 5 },
-      { k: 'spareTire', label: 'Spare truck tire', price: 90, step: 1 },
+      { k: 'spareTire', label: 'Spare Jeep tire', price: 90, step: 1 },
       { k: 'rainBarrel', label: 'Rain barrel', price: 60, step: 1, max: 1 },
       { k: 'bugSpray', label: 'Bug spray', price: 8, step: 1 },
     ]
@@ -362,7 +362,7 @@ function store(id, back) {
   };
   const leave = bought => {
     if (back) return back();
-    if (bought) return outcome('Loaded Up', `Todd loads the truck. ${pick(['Kirsten raises an eyebrow at the receipt.', 'The truck sits noticeably lower.', 'Todd hums the Rocky theme the whole drive home.', 'A neighbor waves. Todd waves back, suspiciously.'])}`);
+    if (bought) return outcome('Loaded Up', `Todd loads the Jeep. ${pick(['Kirsten raises an eyebrow at the receipt.', 'The Jeep sits noticeably lower.', 'Todd hums the Rocky theme the whole drive home.', 'A neighbor waves. Todd waves back, suspiciously.'])}`);
     prepHub();
   };
   function render() {
@@ -417,11 +417,11 @@ function solar() {
   const n = S.panels - S.panelsInstalled;
   scene({
     title: 'Solar Panel Installation',
-    text: `Todd has ${n} panel${n > 1 ? 's' : ''} leaning against the garage. The plan: mount them on a rack over the truck bed, so the power goes wherever the crew goes. Panels will run the ham radio, the fans and the cooler.`,
+    text: `Todd has ${n} panel${n > 1 ? 's' : ''} leaning against the garage. The plan: mount them on a rack over the Jeep's bed, so the power goes wherever the crew goes. Panels will run the ham radio, the fans and the cooler.`,
     choices: [
       { label: 'DIY it — Kirsten holds the ladder', fn: () => { if (chance(0.7)) { S.panelsInstalled = S.panels; mood(10); S.kirsten -= 5; outcome('Success!', `All ${n} panel(s) installed. Kirsten held the ladder for four hours and would like that on the record.`); } else { const half = Math.ceil(n / 2); S.panelsInstalled += half; hurt('Todd', 20); outcome('The Azalea Incident', `Todd installs ${half} panel(s), then falls off the ladder into the azaleas. Todd is hurt. The azaleas did not survive.`); } } },
       { label: `Hire "DJ's guy" ($100)`, disabled: S.money < 100, fn: () => { S.money -= 100; S.panelsInstalled = S.panels; S.djLoyal++; outcome(`DJ's Guy`, `"DJ's guy" turns out to be DJ, wearing a hard hat over his regular hat. The panels are installed perfectly. He also installed a disco ball in the garage. "You're welcome, Todd."`); } },
-      { label: 'Ask Jennifer (she bikes over with a drill in her basket)', fn: () => { S.jenn++; if (chance(0.9)) { S.panelsInstalled = S.panels; outcome('Pedal Power', `Jennifer arrives with a cordless drill, a level and a thermos of coffee, all in a bike basket. Panels mounted in an hour. She also adjusts Todd's truck mirrors "because they were bothering her."`); } else { S.panelsInstalled += Math.ceil(n / 2); outcome('Half Done', `Jennifer gets half the panels up before a thunderstorm rolls in. She bikes home in the rain, grinning.`); } } },
+      { label: 'Ask Jennifer (she bikes over with a drill in her basket)', fn: () => { S.jenn++; if (chance(0.9)) { S.panelsInstalled = S.panels; outcome('Pedal Power', `Jennifer arrives with a cordless drill, a level and a thermos of coffee, all in a bike basket. Panels mounted in an hour. She also adjusts Todd's Jeep mirrors "because they were bothering her."`); } else { S.panelsInstalled += Math.ceil(n / 2); outcome('Half Done', `Jennifer gets half the panels up before a thunderstorm rolls in. She bikes home in the rain, grinning.`); } } },
     ],
   });
 }
@@ -483,7 +483,7 @@ function bikeDay() {
     title: 'Bike Day with Jennifer',
     text: `${first ? 'Jennifer rolls up on her bike, as she does everywhere — to work, to the grocery store, and allegedly once to a wedding where she was in the bridal party. ' : 'Jennifer coasts into the driveway, not even slightly out of breath. '}"No gas, no grid, no problem," she says. "What do you want to learn?"`,
     choices: [
-      { label: 'Bike & tire repair', note: S.bikeRepair ? '(already learned)' : '', disabled: S.bikeRepair, fn: () => { S.bikeRepair = true; outcome('Grease Monkey', `Jennifer teaches Todd to patch a tube, plug a tire and adjust brakes. "Same idea works on a truck tire, more or less." <b>Todd can now fix flats on the trail.</b>`); } },
+      { label: 'Bike & tire repair', note: S.bikeRepair ? '(already learned)' : '', disabled: S.bikeRepair, fn: () => { S.bikeRepair = true; outcome('Grease Monkey', `Jennifer teaches Todd to patch a tube, plug a tire and adjust brakes. "Same idea works on a Jeep tire, more or less." <b>Todd can now fix flats on the trail.</b>`); } },
       { label: 'Water purification', note: S.purify ? '(already learned)' : '', disabled: S.purify, fn: () => { S.purify = true; outcome('Clean Water', `Jennifer builds a filter out of a bandana, sand, charcoal and sheer confidence — then boils everything to be safe. "Never drink creek water straight, Todd." <b>She can now stretch your water on the trail.</b>`); } },
       { label: 'Buy spare bike parts from her stash ($30)', disabled: S.money < 30, fn: () => { S.money -= 30; S.bikeParts += 2; outcome('Parts Department', 'Two tubes, a chain link and a tiny bell that goes "ding." +2 bike parts.'); } },
       { label: 'Ride with her to Vilano Beach and back', fn: () => { mood(15); hurt('Todd', 5); outcome('Leg Day', 'Twenty miles. Jennifer chats the whole way. Todd can no longer feel his thighs. But the bridge at sunrise? Unreal. Morale way up.'); } },
@@ -596,7 +596,7 @@ function gridDown() {
 function trailIntro() {
   say('The Trail', `The plan: get everyone to <b>the Wawa on US-1</b> — the only place in town with generators, coffee and hoagies.<br><br>
 The direct route is blocked (a billboard for a personal-injury lawyer fell across SR-16), so Todd plots the long way: past the outlets, through downtown, across the Bridge of Lions, around Anastasia Island and back over the SR-312 bridge. <b>${TOTAL_MILES} miles</b> of detours.<br><br>
-Everyone drinks about a gallon of water a day. The truck burns about a gallon of gas every 4 miles — when it runs dry, you walk. Keep morale up. Eat cake when needed.`, trailHub, 'Hit the road');
+Everyone drinks about a gallon of water a day. The Jeep burns about a gallon of gas every 4 miles — when it runs dry, you walk. Keep morale up. Eat cake when needed.`, trailHub, 'Hit the road');
 }
 
 /* ============================================================
@@ -648,8 +648,8 @@ function travelDay() {
   S.miles += move;
   let ranOut = false;
   if (!onFoot) { S.gas = Math.max(0, Math.round((S.gas - move / 4) * 10) / 10); ranOut = S.gas <= 0; }
-  passDay(onFoot ? `Walked ${move} miles (the truck is out of gas).` : `Drove ${move} miles.`);
-  if (ranOut) S.lastLog.push('<span class="bad">The truck is OUT OF GAS. You will have to walk (slower) unless you find more.</span>');
+  passDay(onFoot ? `Walked ${move} miles (the Jeep is out of gas).` : `Drove ${move} miles.`);
+  if (ranOut) S.lastLog.push('<span class="bad">The Jeep is OUT OF GAS. You will have to walk (slower) unless you find more.</span>');
   afterDay(() => {
     if (S.miles >= next.mile) { S.lm++; return arrive(next); }
     if (chance(0.6)) return randomEvent();
@@ -677,7 +677,7 @@ function passDay(firstLine, resting = false) {
   let dmg = (resting ? -14 : PACES[S.pace].dmg) + RATIONS[S.rations].dmg;
   if (S.water < 0) { S.water = 0; dmg += 15; log.push('<span class="bad">You are OUT OF WATER. Everyone is dehydrated.</span>'); }
   if (S.food < 0) { S.food = 0; dmg += 8; log.push('<span class="bad">You are OUT OF FOOD.</span>'); }
-  if (S.weather.hot) { dmg += S.panelsInstalled > 0 ? 1 : 3; if (S.panelsInstalled > 0 && chance(0.25)) log.push('Solar-powered fans keep the truck cab bearable.'); }
+  if (S.weather.hot) { dmg += S.panelsInstalled > 0 ? 1 : 3; if (S.panelsInstalled > 0 && chance(0.25)) log.push('Solar-powered fans keep the Jeep cab bearable.'); }
   if (S.morale < 25) { dmg += 3; log.push('Morale is so low that people are sniping at each other.'); }
   ppl.forEach(p => { let d = dmg; if (p === 'DJ' && !S.hat) d += 3; S.party[p].hp = clamp(S.party[p].hp - d, 0, 100); });
   ppl.forEach(p => {
@@ -809,7 +809,7 @@ const EVENTS = [
         { label: 'Take a detour (lose a day)', fn: () => { passDay('Took a long detour around a roadblock.'); afterDay(trailHub); } },
         has('Jon')
           ? { label: 'Send Jon Galluzzo to negotiate', fn: () => { mood(10); S.water += 5; say('The Negotiator', 'Jon walks over. Laughter. Handshakes. A selfie. He walks back with 5 gallons of water that THEY gave HIM.', trailHub); } }
-          : { label: `Bluff: "We're with the power company."`, fn: () => { if (chance(0.5)) say('Bluff Works', 'They scatter instantly. Nobody wants to deal with the power company right now.', trailHub); else { const l = Math.min(S.water, 8); S.water -= l; say('Bluff Fails', `"Then why is your truck full of beans?" You pay them ${l} gallons of water to move the carts.`, trailHub); } } },
+          : { label: `Bluff: "We're with the power company."`, fn: () => { if (chance(0.5)) say('Bluff Works', 'They scatter instantly. Nobody wants to deal with the power company right now.', trailHub); else { const l = Math.min(S.water, 8); S.water -= l; say('Bluff Fails', `"Then why is your Jeep full of beans?" You pay them ${l} gallons of water to move the carts.`, trailHub); } } },
       ],
     })
   },
@@ -862,7 +862,7 @@ const EVENTS = [
       title: 'Gator in the Road', text: 'A nine-foot alligator is sunbathing across both lanes. It does not care about your plans.',
       choices: [
         { label: 'Wait it out', fn: () => { mood(-3); say('Patience', 'Two hours later, the gator slides off into a ditch. Everyone has a sunburn.', trailHub); } },
-        { label: 'Honk', fn: () => { if (chance(0.5)) say('Honk Honk', 'The gator hisses, then waddles away offended.', trailHub); else { const l = Math.min(S.food, 10); S.food -= l; say('Bad Idea', `The gator charges the truck. Everyone screams. In the chaos, a cooler tips out the back and ${l} lb of food is now gator food.`, trailHub); } } },
+        { label: 'Honk', fn: () => { if (chance(0.5)) say('Honk Honk', 'The gator hisses, then waddles away offended.', trailHub); else { const l = Math.min(S.food, 10); S.food -= l; say('Bad Idea', `The gator charges the Jeep. Everyone screams. In the chaos, a cooler tips out the back and ${l} lb of food is now gator food.`, trailHub); } } },
         has('DJ') && { label: 'Let DJ handle it', fn: () => { hurt('DJ', 15); mood(20); say('DJ vs. Gator', `DJ hands his hat to Todd, says "hold this," and walks toward the gator yelling about "alpha energy." The gator, deeply confused, leaves. DJ is scraped up but triumphant. Morale is through the roof.`, trailHub); } },
       ].filter(Boolean),
     })
@@ -870,7 +870,7 @@ const EVENTS = [
   { ok: () => has('Kirsten'), bad: false, run: () => { mood(15); healAll(4); say('Sing-Along', `Kirsten starts singing "Margaritaville." By the second chorus, everyone is singing. ${has('DJ') ? 'DJ knows every word and does harmonies. ' : ''}It's the best mood the crew has been in for days.`, trailHub); } },
   {
     ok: () => S.ammo >= 3, bad: false, run: () => scene({
-      title: 'Wild Hog!', text: 'A 200-pound feral hog bursts out of the palmettos and stares down the truck. It has tusks. It has attitude.',
+      title: 'Wild Hog!', text: 'A 200-pound feral hog bursts out of the palmettos and stares down the Jeep. It has tusks. It has attitude.',
       choices: [
         { label: 'Take the shot (3 rounds)', fn: () => { S.ammo -= 3; const p = 0.45 + S.marksman * 0.15 + (has('Kirsten') && S.kirstenShoots ? 0.15 : 0); if (chance(p)) { S.food += 60; say('Dinner', `Clean shot${has('Kirsten') && S.kirstenShoots ? ' (Kirsten called it)' : ''}. +60 lb of food. Pulled pork for days.`, trailHub); } else { hurt(pick(active()), 15); say('Missed!', 'The hog charges, bowls someone into the palmettos, and vanishes. Everyone is fine-ish.', trailHub); } } },
         { label: 'Back away slowly', fn: () => say('Standoff', 'You back away. The hog wins the staring contest. The hog always wins.', trailHub) },
@@ -967,9 +967,9 @@ const LM = {
       title: 'The Bridge of Lions',
       text: `The Bridge of Lions is a drawbridge. When the grid went down, it was <b>open</b>. Now both halves point at the sky, and the two marble lions guarding the entrance look as disappointed as you are.<br><br>The Matanzas River is about a quarter-mile across here. How will you cross?`,
       choices: [
-        { label: `Jump the gap in the truck${has('DJ') ? ` (DJ's idea)` : ''}`, fn: () => { mood(-3); say('Absolutely Not', `${has('Kirsten') ? 'Kirsten' : 'Jennifer'} snatches the keys out of the ignition before Todd can rev the engine. "We are NOT doing a Dukes of Hazzard." Probably for the best.`, LM.bridge); } },
-        { label: 'Float the truck across on pool noodles', note: '(risky)', fn: floatAcross },
-        { label: `Hire ${S.intel.boat ? 'Captain Ray' : 'a shrimp boat captain'} — pay in cake`, note: `(${capCost} slices)`, disabled: S.cake < capCost, fn: () => { S.cake -= capCost; mood(5); say('Smooth Sailing', `${S.intel.boat ? `"Matt sent ya? Hop on." ` : ''}The shrimp boat chugs across the Matanzas with the truck lashed to the deck. ${has('Jennifer') ? `Jennifer's bike rides up front like a figurehead. ` : ''}Dolphins escort you. The captain eats ${capCost} slices of cake in one sitting. A fair price.`, trailHub); } },
+        { label: `Jump the gap in the Jeep${has('DJ') ? ` (DJ's idea)` : ''}`, fn: () => { mood(-3); say('Absolutely Not', `${has('Kirsten') ? 'Kirsten' : 'Jennifer'} snatches the keys out of the ignition before Todd can rev the engine. "We are NOT doing a Dukes of Hazzard." Probably for the best.`, LM.bridge); } },
+        { label: 'Float the Jeep across on pool noodles', note: '(risky)', fn: floatAcross },
+        { label: `Hire ${S.intel.boat ? 'Captain Ray' : 'a shrimp boat captain'} — pay in cake`, note: `(${capCost} slices)`, disabled: S.cake < capCost, fn: () => { S.cake -= capCost; mood(5); say('Smooth Sailing', `${S.intel.boat ? `"Matt sent ya? Hop on." ` : ''}The shrimp boat chugs across the Matanzas with the Jeep lashed to the deck. ${has('Jennifer') ? `Jennifer's bike rides up front like a figurehead. ` : ''}Dolphins escort you. The captain eats ${capCost} slices of cake in one sitting. A fair price.`, trailHub); } },
         { label: `Hire ${S.intel.boat ? 'Captain Ray' : 'a shrimp boat captain'} — pay cash`, note: `($${cashCost})`, disabled: S.money < cashCost, fn: () => { S.money -= cashCost; say('Smooth Sailing', 'The captain counts the cash twice, then ferries you across. Dolphins escort you the whole way.', trailHub); } },
         { label: 'Wait for the bridge crew to crank it down by hand', note: '(2 days)', fn: () => { passDay('Waited at the Bridge of Lions.'); afterDay(() => { passDay('Still waiting at the Bridge of Lions.'); afterDay(() => say('Slowly, Slowly', 'Two days and roughly 4,000 hand-cranks later, the bridge comes down. A small crowd cheers. You drive across like royalty.', trailHub)); }); } },
       ],
@@ -1036,7 +1036,7 @@ function hunt() {
   huntState = { done: false };
   scene({
     title: 'Hunting',
-    text: `Click or tap to shoot. You have ${S.ammo} rounds and 30 seconds. ${S.intel.hogs ? `Matt was right — the hogs are everywhere out here. ` : ''}You can carry ${100 + (has('Jennifer') ? 50 : 0)} lb back to the truck${has('Jennifer') ? ` (Jennifer's bike trailer helps)` : ''}.`,
+    text: `Click or tap to shoot. You have ${S.ammo} rounds and 30 seconds. ${S.intel.hogs ? `Matt was right — the hogs are everywhere out here. ` : ''}You can carry ${100 + (has('Jennifer') ? 50 : 0)} lb back to the Jeep${has('Jennifer') ? ` (Jennifer's bike trailer helps)` : ''}.`,
     html: `<canvas id="huntCanvas" width="320" height="180"></canvas><div class="hunthud"><span id="hTime">30</span>s &middot; Ammo <span id="hAmmo">${S.ammo}</span> &middot; Bagged <span id="hLbs">0</span> lb</div>`,
     choices: [{ label: 'Stop hunting', fn: () => endHunt() }],
     after: startHunt,
@@ -1109,7 +1109,7 @@ function endHunt() {
   const counts = {}; (H.bag || []).forEach(n => counts[n] = (counts[n] || 0) + 1);
   const list = Object.entries(counts).map(([n, c]) => `${c} ${n}${c > 1 ? (n.endsWith('y') ? 's' : n.endsWith('cake') ? 's' : 's') : ''}`).join(', ');
   let t = list ? `You bagged: ${list}.<br>` : 'You came back empty-handed. The squirrels are laughing at you.<br>';
-  if (H.lbs) t += `That's ${H.lbs} lb of food.${H.lbs > cap ? ` <span class="bad">You can only carry ${cap} lb back to the truck.</span>` : ''} +${carried} lb food.`;
+  if (H.lbs) t += `That's ${H.lbs} lb of food.${H.lbs > cap ? ` <span class="bad">You can only carry ${cap} lb back to the Jeep.</span>` : ''} +${carried} lb food.`;
   if (H.cake) t += `<br><span class="hl">...and ${H.cake} wild white sheet cake${H.cake > 1 ? 's' : ''}?! +${H.cake * 6} slices. Nobody can explain this. Todd does not ask questions.</span>`;
   passDay('Spent the day hunting.');
   afterDay(() => say('Hunt Results', t, trailHub));
@@ -1174,30 +1174,44 @@ function drawScene(ctx, off, t, moving) {
   // palms
   for (let i = 0; i < 6; i++) { const px = ((i * 71 - off) % 426 + 426) % 426 - 50; palm(ctx, px, 68, 1); }
   // party
-  const showBike = title || has('Jennifer');
+  const showBike = !title && has('Jennifer');
   const bob = moving && Math.floor(t / 110) % 2 ? 1 : 0;
   if (!S || S.gas > 0 || title) truck(ctx, 168, 58 - bob, t, moving);
   else walkers(ctx, 190, 66, t, moving);
   if (showBike) bike(ctx, 128, 67, t, moving);
 }
 
+/* Todd's black Jeep Gladiator: boxy cab, flat hood, square fenders, 7-slot grille, round headlights, pickup bed */
 function truck(ctx, x, y, t, moving) {
-  rect(ctx, '#b8322a', x, y + 6, 28, 8);
-  rect(ctx, '#b8322a', x + 28, y, 16, 14);
-  rect(ctx, '#b8322a', x + 44, y + 6, 7, 8);
-  rect(ctx, '#8e231d', x, y + 12, 51, 2);
-  rect(ctx, '#9ed7ff', x + 31, y + 2, 10, 5);
-  rect(ctx, '#ffffcc', x + 50, y + 7, 1, 2);
-  rect(ctx, '#ccc', x + 50, y + 11, 2, 3);
+  const body = '#1c1c1f', hi = '#3a3a40', trim = '#0b0b0c';
+  // bed
+  rect(ctx, body, x, y + 6, 26, 8); rect(ctx, hi, x, y + 6, 26, 1);
+  rect(ctx, trim, x + 25, y + 6, 1, 8);
+  // cab (tall & square) with roll-bar style roof
+  rect(ctx, body, x + 26, y - 1, 16, 15); rect(ctx, hi, x + 26, y - 1, 16, 1);
+  rect(ctx, trim, x + 34, y, 1, 13);
+  rect(ctx, '#9ed7ff', x + 28, y + 1, 5, 5); rect(ctx, '#9ed7ff', x + 36, y + 1, 5, 5);
+  rect(ctx, '#7ab8e0', x + 28, y + 5, 5, 1); rect(ctx, '#7ab8e0', x + 36, y + 5, 5, 1);
+  // flat hood + upright grille
+  rect(ctx, body, x + 42, y + 5, 10, 9); rect(ctx, hi, x + 42, y + 5, 10, 1);
+  rect(ctx, trim, x + 51, y + 5, 2, 9);
+  for (let i = 0; i < 4; i++) rect(ctx, '#555', x + 52, y + 7 + i * 2, 1, 1);
+  rect(ctx, '#ffffcc', x + 51, y + 6, 2, 2);
+  // square flared fenders + rock rails
+  rect(ctx, trim, x + 2, y + 11, 12, 2); rect(ctx, trim, x + 38, y + 11, 13, 2);
+  rect(ctx, '#2a2a2e', x + 14, y + 13, 24, 1);
+  rect(ctx, '#333', x + 52, y + 12, 2, 3);
+  // spare tire on the tailgate
+  rect(ctx, '#111', x - 3, y + 6, 3, 7); rect(ctx, '#444', x - 2, y + 9, 1, 1);
   // cargo
   rect(ctx, '#c9a26b', x + 3, y + 2, 6, 4); rect(ctx, '#3a6ac9', x + 10, y + 1, 5, 5); rect(ctx, '#e8e8e8', x + 16, y + 3, 7, 3); rect(ctx, '#f6a', x + 16, y + 2, 7, 1);
-  if (S && S.panelsInstalled > 0) { rect(ctx, '#888', x + 2, y - 1, 1, 7); rect(ctx, '#888', x + 25, y - 1, 1, 7); rect(ctx, '#1b2a6b', x + 1, y - 2, 26, 3); for (let i = 0; i < 26; i += 5) rect(ctx, '#4a6bd6', x + 1 + i, y - 2, 1, 3); }
-  // driver + DJ's hat
-  rect(ctx, '#e0b08a', x + 35, y + 3, 3, 3);
-  if (S && has('DJ')) { rect(ctx, '#e0b08a', x + 40, y - 3, 4, 4); if (S.hat) { rect(ctx, '#3b2a1a', x + 38, y - 4, 8, 1); rect(ctx, '#3b2a1a', x + 39, y - 7, 6, 3); rect(ctx, '#c33', x + 39, y - 5, 6, 1); } }
-  // wheels
+  if (S && S.panelsInstalled > 0) { rect(ctx, '#888', x + 2, y - 1, 1, 7); rect(ctx, '#888', x + 23, y - 1, 1, 7); rect(ctx, '#1b2a6b', x + 1, y - 2, 24, 3); for (let i = 0; i < 24; i += 5) rect(ctx, '#4a6bd6', x + 1 + i, y - 2, 1, 3); }
+  // Todd at the wheel + DJ riding shotgun in his hat
+  rect(ctx, '#e0b08a', x + 37, y + 2, 3, 3);
+  if (S && has('DJ')) { rect(ctx, '#e0b08a', x + 29, y + 2, 3, 3); if (S.hat) { rect(ctx, '#3b2a1a', x + 27, y + 1, 7, 1); rect(ctx, '#3b2a1a', x + 28, y - 1, 5, 2); rect(ctx, '#c33', x + 28, y, 5, 1); } }
+  // big off-road tires
   const spin = moving && Math.floor(t / 80) % 2;
-  [x + 5, x + 37].forEach(wx => { rect(ctx, '#222', wx, y + 12, 8, 7); rect(ctx, spin ? '#999' : '#bbb', wx + 3, y + 14, 2, 2); });
+  [x + 4, x + 40].forEach(wx => { rect(ctx, '#111', wx, y + 12, 9, 8); rect(ctx, '#222', wx + 1, y + 13, 7, 6); rect(ctx, spin ? '#777' : '#999', wx + 3, y + 15, 3, 2); });
 }
 
 function bike(ctx, x, y, t, moving) {
