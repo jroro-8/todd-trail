@@ -63,7 +63,7 @@ const AILMENTS = [
 ];
 const LEAVE = {
   Kirsten: `Kirsten has had ENOUGH. She flags down her cousin's pontoon boat and heads for her mom's place in Palm Coast. "Call me when the lights are back on, Todd."`,
-  Jennifer: `Jennifer clips in, waves, and pedals home. She'll be fine. She's always fine. She has, like, four bikes.`,
+  Jennifer: `Jennifer, who is somewhere between 94 and 107 depending on who you ask, announces it is past her bedtime. She clips in and pedals home at a steady 6 mph. She'll be fine. She survived the Spanish flu.`,
   DJ: `DJ flags down a passing airboat, yells "I'LL SEE YOU AT THE OFFICE!" and is gone. His hat is the last thing you see.`,
   Jon: `Jon Galluzzo is too exhausted to keep looking this good. He retreats to a friend's porch to recover. (He still looks great.)`,
 };
@@ -108,6 +108,7 @@ function newState(bg) {
     party: {}, hat: true,
     tday: 0, miles: 0, lm: 0, pace: 0, rations: 0, weather: null, lastLog: [],
     radioDay: -1, tradeDay: -1, jonLate: false, lastEvent: -1,
+    met: {}, alexStole: 0, cakeSafe: false, kelseyTrust: 0,
   };
   MEMBERS.forEach(n => s.party[n] = { hp: 100, in: n === 'Todd' || n === 'Kirsten', gone: false });
   return s;
@@ -130,7 +131,7 @@ const radioPowered = () => S.radioSetup && (S.panelsInstalled > 0 || S.batteries
 function save(where) { S.resume = where; try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { } }
 function loadSave() { try { const t = localStorage.getItem(SAVE_KEY); return t ? JSON.parse(t) : null; } catch (e) { return null; } }
 function clearSave() { try { localStorage.removeItem(SAVE_KEY); } catch (e) { } }
-const RESUME = { prepHub: () => prepHub(), trailHub: () => trailHub() };
+const RESUME = { prepHub: () => { S.met = S.met || {}; S.alexStole = S.alexStole || 0; prepHub(); }, trailHub: () => { S.met = S.met || {}; S.alexStole = S.alexStole || 0; trailHub(); } };
 
 /* ---------------- UI ---------------- */
 function statusBar() {
@@ -186,7 +187,7 @@ function title() {
 function howTo() {
   say('Learn About the Trail', `<b>PART 1 — THE PREP (14 days).</b> Each day Todd does one thing: work a shift for DJ to earn cash, shop, practice at the range, install solar panels, set up the ham radio to reach Matt, keep Kirsten happy, learn survival skills from Jennifer, or fill every container in the house with water.<br><br>
 <b>PART 2 — THE TRAIL (${TOTAL_MILES} miles).</b> The grid goes down. Lead the crew across St. Augustine to the Wawa on US-1. Everyone drinks about a gallon of water a day and eats 1–2 lb of food. Set your pace and rations, hunt, trade, rest, and handle whatever Florida throws at you.<br><br>
-<b>TIPS.</b> Solar panels power the ham radio and keep the food cold. Matt's intel helps you dodge trouble. Jon Galluzzo gets better deals from everyone. DJ must not lose his hat. White cake fixes morale. Nobody gets left behind if you can help it.`, title, 'Back');
+<b>TIPS.</b> Solar panels power the ham radio and keep the food cold. Matt's intel helps you dodge trouble. Jon Galluzzo gets better deals from everyone. DJ must not lose his hat. White cake fixes morale. Eliza is very open-minded. West is wise. Kelsey is "from Ohio." And watch out for Alex — every slice of cake she steals is a demerit on your final score. Nobody gets left behind if you can help it.`, title, 'Back');
 }
 
 function chooseBackground() {
@@ -200,7 +201,7 @@ function chooseBackground() {
 
 function intro() {
   say('Day 1', `It is ${dateStr(0)}. Todd is leaning against his black Jeep Gladiator, staring at a power line. It hums. It is <i>judging</i> him.<br><br>
-Todd's ham radio buddy Matt has heard "chatter." Todd's gut agrees. In <b>14 days</b>, Todd believes, the grid will go down — and when it does, the whole town will head for the one place in St. Augustine with industrial generators, hot coffee and an endless supply of hoagies:<br><br>
+Todd's ham radio buddy Matt — a conspiracy theorist with a garage full of ammo — has heard "chatter." Todd's gut agrees. In <b>14 days</b>, Todd believes, the grid will go down — and when it does, the whole town will head for the one place in St. Augustine with industrial generators, hot coffee and an endless supply of hoagies:<br><br>
 <span class="hl">THE WAWA ON US-1.</span><br><br>
 Each day, choose one thing to do. Prep wisely. And never, ever run out of white cake.`, prepHub, 'Begin prepping');
 }
@@ -279,14 +280,14 @@ function workShift() {
         outcome('A Visitor', `Around 2 PM the whole office goes quiet. Someone has walked in. Strong jaw. Great hair. Somehow lit from slightly above at all times.<br><br>"Jon Galluzzo," he says, shaking Todd's hand. Todd hears a faint choir.<br><br>Todd tells Jon about the grid. Jon nods thoughtfully. "I'm in. I look great by candlelight."<br><br><b>Jon Galluzzo will join your crew.</b> +$${pay}.`);
       } else {
         S.money += 25;
-        outcome('Normal Day', `A normal day at the office. DJ wore a hat. Matt talked about antennas. Jennifer biked in at 7 AM, annoyingly well-rested. +$${pay + 25}.`);
+        outcome('Normal Day', `A normal day at the office. DJ wore a hat. Matt explained that Publix knows something. Jennifer, who is very, very old, biked in at 5 AM and has already done a crossword in pen. +$${pay + 25}.`);
       }
     },
     () => scene({
       title: 'Code Red: The Hat', text: `DJ storms out of his office. "WHERE. IS. MY. HAT." He is hatless. It is deeply unsettling. Nobody can focus.`,
       choices: [
         { label: 'Organize a search party', fn: () => { S.money += pay; S.djLoyal += 2; outcome('Found It', `Todd finds the hat in the break room fridge next to someone's yogurt. DJ hugs Todd for an uncomfortably long time. "I owe you one, Todd." +$${pay}. <b>DJ will remember this.</b>`); } },
-        { label: 'Keep your head down and work', fn: () => { S.money += pay; outcome('Head Down', `Todd keeps working. Jennifer finds the hat. DJ names Jennifer "Chief Hat Officer." +$${pay}.`); } },
+        { label: 'Keep your head down and work', fn: () => { S.money += pay; outcome('Head Down', `Todd keeps working. Jennifer, who has been finding lost hats since the Truman administration, finds it in four seconds. DJ names her "Chief Hat Officer." +$${pay}.`); } },
       ],
     }),
   ];
@@ -421,7 +422,7 @@ function solar() {
     choices: [
       { label: 'DIY it — Kirsten holds the ladder', fn: () => { if (chance(0.7)) { S.panelsInstalled = S.panels; mood(10); S.kirsten -= 5; outcome('Success!', `All ${n} panel(s) installed. Kirsten held the ladder for four hours and would like that on the record.`); } else { const half = Math.ceil(n / 2); S.panelsInstalled += half; hurt('Todd', 20); outcome('The Azalea Incident', `Todd installs ${half} panel(s), then falls off the ladder into the azaleas. Todd is hurt. The azaleas did not survive.`); } } },
       { label: `Hire "DJ's guy" ($100)`, disabled: S.money < 100, fn: () => { S.money -= 100; S.panelsInstalled = S.panels; S.djLoyal++; outcome(`DJ's Guy`, `"DJ's guy" turns out to be DJ, wearing a hard hat over his regular hat. The panels are installed perfectly. He also installed a disco ball in the garage. "You're welcome, Todd."`); } },
-      { label: 'Ask Jennifer (she bikes over with a drill in her basket)', fn: () => { S.jenn++; if (chance(0.9)) { S.panelsInstalled = S.panels; outcome('Pedal Power', `Jennifer arrives with a cordless drill, a level and a thermos of coffee, all in a bike basket. Panels mounted in an hour. She also adjusts Todd's Jeep mirrors "because they were bothering her."`); } else { S.panelsInstalled += Math.ceil(n / 2); outcome('Half Done', `Jennifer gets half the panels up before a thunderstorm rolls in. She bikes home in the rain, grinning.`); } } },
+      { label: 'Ask Jennifer (she bikes over with a drill in her basket, at age 96)', fn: () => { S.jenn++; if (chance(0.9)) { S.panelsInstalled = S.panels; outcome('Pedal Power', `Jennifer arrives with a cordless drill, a level and a thermos of Sanka, all in a bike basket. She has been installing things since before electricity was popular. Panels mounted in an hour. She also adjusts Todd's Jeep mirrors "because they were bothering her."`); } else { S.panelsInstalled += Math.ceil(n / 2); outcome('Half Done', `Jennifer gets half the panels up before a thunderstorm rolls in. She bikes home in the rain, grinning.`); } } },
     ],
   });
 }
@@ -439,7 +440,7 @@ function giveIntel(night) {
   const next = night ? prepHub : nextDay;
   const left = Object.keys(INTEL).filter(k => !S.intel[k]);
   mood(4);
-  if (!left.length) return say('Ham Radio', `Matt talks about antenna wavelengths for three hours. Todd understands about 12% of it. It's nice, though.`, next);
+  if (!left.length) return say('Ham Radio', `Matt talks for three hours about how pelicans are surveillance drones run by the Department of Fish and Wildlife. Todd understands about 12% of it. Some of it makes a disturbing amount of sense.`, next);
   const k = pick(left); S.intel[k] = true;
   say(night ? 'Late-Night Transmission' : 'On the Air with Matt', `<i>*kssshhht*</i> "Todd, this is Matt, over."<br><br>${INTEL[k]}`, next);
 }
@@ -447,7 +448,7 @@ function hamRadio() {
   if (S.radioSetup) return giveIntel(false);
   scene({
     title: 'The Ham Radio',
-    text: `Todd's coworker Matt has been a licensed ham operator since before it was cool (it has never been cool). When the cell towers go down, Matt's voice will be the only news Todd trusts. First, Todd needs an antenna.`,
+    text: `Todd's coworker Matt has been a licensed ham operator since before it was cool (it has never been cool). He does not trust cell phones ("they listen"), birds ("they're not real") or the moon ("too convenient"). He also owns more ammunition than some small nations. When the cell towers go down, Matt's voice will be the only news Todd trusts. First, Todd needs an antenna.`,
     choices: [
       { label: 'Put up a 40-foot antenna in the backyard', fn: () => { S.radioSetup = true; S.kirsten -= 10; mood(10); outcome('Antenna Up', `The antenna is enormous. Planes now route around the neighborhood. Kirsten is NOT happy about the view. But the signal is perfect: "Todd, this is Matt. You're coming in five-by-nine. Over."<br><br><b>Matt is now your radio contact.</b> On the trail, you'll need solar panels or a battery bank to power the radio.`); } },
       { label: 'Hide a modest wire antenna in the attic', fn: () => { S.radioSetup = true; mood(5); hurt('Todd', 5); outcome('Stealth Mode', `Todd crawls through 130-degree attic insulation to string the wire. It works! "Todd, this is Matt. You sound like you're inside a microwave. Over."<br><br><b>Matt is now your radio contact.</b> On the trail, you'll need solar panels or a battery bank to power the radio.`); } },
@@ -481,12 +482,12 @@ function bikeDay() {
   S.jenn++;
   scene({
     title: 'Bike Day with Jennifer',
-    text: `${first ? 'Jennifer rolls up on her bike, as she does everywhere — to work, to the grocery store, and allegedly once to a wedding where she was in the bridal party. ' : 'Jennifer coasts into the driveway, not even slightly out of breath. '}"No gas, no grid, no problem," she says. "What do you want to learn?"`,
+    text: `${first ? 'Jennifer rolls up on her bike, as she has done everywhere since roughly 1938. Nobody knows exactly how old Jennifer is. Her driver\'s license is written on parchment. She has outlived three bikes and two bike shops. ' : 'Jennifer coasts into the driveway at a dignified 4 mph, hearing aid whistling, not even slightly out of breath. '}"Sonny, I lived through the Great Depression on a bicycle," she says. "No gas, no grid, no problem. What do you want to learn?"`,
     choices: [
-      { label: 'Bike & tire repair', note: S.bikeRepair ? '(already learned)' : '', disabled: S.bikeRepair, fn: () => { S.bikeRepair = true; outcome('Grease Monkey', `Jennifer teaches Todd to patch a tube, plug a tire and adjust brakes. "Same idea works on a Jeep tire, more or less." <b>Todd can now fix flats on the trail.</b>`); } },
-      { label: 'Water purification', note: S.purify ? '(already learned)' : '', disabled: S.purify, fn: () => { S.purify = true; outcome('Clean Water', `Jennifer builds a filter out of a bandana, sand, charcoal and sheer confidence — then boils everything to be safe. "Never drink creek water straight, Todd." <b>She can now stretch your water on the trail.</b>`); } },
-      { label: 'Buy spare bike parts from her stash ($30)', disabled: S.money < 30, fn: () => { S.money -= 30; S.bikeParts += 2; outcome('Parts Department', 'Two tubes, a chain link and a tiny bell that goes "ding." +2 bike parts.'); } },
-      { label: 'Ride with her to Vilano Beach and back', fn: () => { mood(15); hurt('Todd', 5); outcome('Leg Day', 'Twenty miles. Jennifer chats the whole way. Todd can no longer feel his thighs. But the bridge at sunrise? Unreal. Morale way up.'); } },
+      { label: 'Bike & tire repair', note: S.bikeRepair ? '(already learned)' : '', disabled: S.bikeRepair, fn: () => { S.bikeRepair = true; outcome('Grease Monkey', `Jennifer teaches Todd to patch a tube, plug a tire and adjust brakes, pausing twice to tell him what bread cost in 1946. "Same idea works on a Jeep tire, more or less." <b>Todd can now fix flats on the trail.</b>`); } },
+      { label: 'Water purification', note: S.purify ? '(already learned)' : '', disabled: S.purify, fn: () => { S.purify = true; outcome('Clean Water', `Jennifer builds a filter out of a handkerchief, sand, charcoal and "what we did in the war" — then boils everything to be safe. "Never drink creek water straight, Todd." <b>She can now stretch your water on the trail.</b>`); } },
+      { label: 'Buy spare bike parts from her stash ($30)', disabled: S.money < 30, fn: () => { S.money -= 30; S.bikeParts += 2; outcome('Parts Department', 'Two tubes, a chain link and a brass bell older than Todd\'s parents. +2 bike parts.'); } },
+      { label: 'Ride with her to Vilano Beach and back', fn: () => { mood(15); hurt('Todd', 5); outcome('Leg Day', 'Twenty miles. Jennifer, who is very old, chats the whole way and still drops Todd on the bridge. Todd can no longer feel his thighs. But the bridge at sunrise? Unreal. Morale way up.'); } },
     ],
   });
 }
@@ -517,6 +518,72 @@ const NIGHT = [
   { ok: () => true, run: () => { healAll(5); mood(5); say('A Quiet Night', 'Crickets. A breeze off the Matanzas. Somewhere a peacock screams. Todd sleeps like a baby with a bug-out bag.', prepHub); } },
   { ok: () => S.metJon, run: () => { mood(5); S.food += 8; say('Jon Drops By', `Jon Galluzzo stops by with a bag of groceries. "Neighbors kept handing me stuff on my run." +8 lb food. He also fixes a squeaky door by looking at it.`, prepHub); } },
 ];
+/* ---- Recurring characters: Matt's ammo, Eliza, Alex, West, Kelsey ---- */
+function alexSteals(max) {
+  let n = Math.min(S.cake, R(1, max));
+  if (S.cakeSafe) n = Math.min(n, 1);
+  S.cake -= n; S.alexStole = (S.alexStole || 0) + n;
+  return n;
+}
+NIGHT.push(
+  { ok: () => true, run: () => { S.ammo += 60; say('3 AM Delivery', `Headlights off, Matt's truck backs into Todd's driveway at 3 AM. He unloads three ammo cans without a word, then leans in close.<br><br>"For the cause. Don't tell the pelicans. They report to Tallahassee."<br><br>He also leaves a pamphlet titled <i>BIRDS: Who Is Really Watching?</i> +60 rounds of ammo.`, prepHub); } },
+  { ok: () => true, run: elizaPrep },
+  { ok: () => S.cake > 0, run: alexPrep },
+  { ok: () => S.cake > 0, run: alexPrep },
+  { ok: () => true, run: westPrep },
+  { ok: () => true, run: kelseyPrep },
+);
+
+function elizaPrep() {
+  S.met.eliza = true;
+  scene({
+    title: 'A Knock at Midnight',
+    text: `It's <b>Eliza</b>, the witchy woman from down the street, in a velvet cloak, holding a cat that is not hers. Before Todd can say a word: "I'm very open-minded."<br><br>Nobody asked. Nobody ever asks. She offers her services.`,
+    choices: [
+      { label: 'Get a tarot reading', fn: () => { S.tip++; say('The Tower', `Eliza flips a card: The Tower. "Big change is coming. The lights. The bridge. A lion who cannot close his mouth." She leans in. "I'm very open-minded, so I'm not judging the beans." <span class="hl">You'll dodge the next bit of trouble on the trail.</span>`, prepHub); } },
+      { label: 'Buy a jug of "moon water" ($10)', disabled: S.money < 10, fn: () => { S.money -= 10; S.water += 8; say('Moon Water', `It's tap water that sat outside during a full moon. It's also 8 perfectly good gallons. "I'm very open-minded about what counts as water," Eliza says. +8 gallons.`, prepHub); } },
+      { label: 'Let her cleanse the house with sage', fn: () => { mood(10); S.kirsten -= 5; say('Cleansed', `Eliza wafts sage through every room. The smoke alarm disagrees. Kirsten is not open-minded about this. Todd, however, feels lighter. Morale up.`, prepHub); } },
+    ],
+  });
+}
+function alexPrep() {
+  S.met.alex = true;
+  const n = alexSteals(4);
+  scene({
+    title: 'The Cake Bandit Strikes',
+    text: `<b>Alex</b> — who is, objectively, stunningly beautiful — stopped by "to borrow a cup of sugar." She was very charming. Todd doesn't remember most of the conversation.<br><br>Later, Todd opens the cooler. <span class="bad">${n} slice${n === 1 ? '' : 's'} of white cake: gone.</span> There is frosting on the doorknob. There is a lipstick mark on the cooler lid.`,
+    choices: [
+      { label: 'Go confront her', fn: () => { const m = alexSteals(1); say('Confrontation', `Todd marches over. Alex opens the door, smiles, and tilts her head. Todd forgets what he came for and ${m ? 'somehow hands her ONE MORE slice' : 'apologizes for bothering her'}. Strong work, Todd.`, prepHub); } },
+      { label: 'Lock the cake in the gun safe from now on', disabled: !!S.cakeSafe, note: S.cakeSafe ? '(already done)' : '', fn: () => { S.cakeSafe = true; say('Maximum Security', `The white cake now lives in the gun safe, next to the important documents. <span class="hl">Alex can only get one slice at a time now.</span> (She will still try.)`, prepHub); } },
+      { label: 'Let it go', fn: () => { mood(-5); say('Let It Go', `Todd lets it go. It's not the first time. It won't be the last. <span class="bad">Every slice Alex steals costs you points at the end.</span>`, prepHub); } },
+    ],
+  });
+}
+function westPrep() {
+  S.met.west = true;
+  scene({
+    title: 'The Wise Man on the Bench',
+    text: `<b>West</b> sits on his usual bench outside the hardware store, whittling something that might be a duck. People say he has never been wrong. People also say he once out-fished a pelican with his bare hands. He motions Todd over. "Sit. Ask."`,
+    choices: [
+      { label: '"Is the grid really going down?"', fn: () => { mood(10); S.tip++; say('West Speaks', `West whittles for a long time. "The grid always goes down, son. The question is whether you're ready when it does." He hands Todd the duck. <span class="hl">You'll dodge the next bit of trouble on the trail.</span>`, prepHub); } },
+      { label: '"What should I stock up on?"', fn: () => { S.water += 10; say('West Speaks', `"More water than you think. Then more than that." He points to a pallet behind the bench. "Take ten. I bought too much in '04." +10 gallons of water.`, prepHub); } },
+      { label: '"How do I keep my crew together?"', fn: () => { mood(15); S.kirsten += 10; say('West Speaks', `"A man who hoards cake has cake. A man who shares cake has friends." He pauses. "And watch out for Alex." Morale up. Todd goes home and is nicer to Kirsten.`, prepHub); } },
+    ],
+  });
+}
+function kelseyPrep() {
+  S.met.kelsey = true;
+  scene({
+    title: 'The New Neighbor',
+    text: `A new neighbor named <b>Kelsey</b> has moved in across the street. She says she's from "Ohio." She pronounces it "O-hee-yo." Her moving boxes are labeled in Cyrillic. She jogs every morning at 5 AM and photographs every power substation she passes.<br><br>She waves. "Hello, comrade — I mean, neighbor."`,
+    choices: [
+      { label: 'Welcome her with a slice of white cake', disabled: S.cake < 1, fn: () => { S.cake--; S.gas += 5; S.kelseyTrust = (S.kelseyTrust || 0) + 1; say('Diplomatic Relations', `Kelsey eats the cake in one bite. "Is very good. In my country— in Ohio, we do not have such cake." She gives Todd 5 gallons of gas "from the embassy— from my garage." +5 gallons of gas.`, prepHub); } },
+      { label: 'Report her to Matt', fn: () => { mood(5); S.ammo += 20; say('Matt Is Not Surprised', `"Todd. TODD. I have a whole binder on her. She's been pinging repeater 146.52 every night at 2 AM." Matt drops off 20 extra rounds "just in case." +20 rounds of ammo.`, prepHub); } },
+      { label: 'Wave back and mind your business', fn: () => say('Neighborly', `Todd waves. Kelsey waves. A black SUV idles at the end of the street for six hours. Totally normal.`, prepHub) },
+    ],
+  });
+}
+
 function nightEvent() { pick(NIGHT.filter(e => e.ok())).run(); }
 
 function kirstenFindsCans() {
@@ -580,14 +647,14 @@ function gridDown() {
     lines.push(`<b>Kirsten</b> has decided to ride out the outage at her mom's place in Palm Coast. ${c ? `She takes ${c} slice${c > 1 ? 's' : ''} of white cake. Fair.` : ''} <span class="bad">(Keep her happier next time.)</span>`);
   }
   S.party.Jennifer.in = true;
-  lines.push(S.jenn > 0 ? `<b>Jennifer</b> rides up, panniers loaded. "Told you. No gas, no problem."` : `<b>Jennifer</b> rides up anyway. "You didn't invite me? Rude. I'm coming."`);
+  lines.push(S.jenn > 0 ? `<b>Jennifer</b> rides up, panniers loaded, shawl fluttering. She is very, very old and has seen four grids go down. "Amateurs," she says.` : `<b>Jennifer</b> rides up anyway, ancient and unstoppable. "You didn't invite me? I knew your grandfather. I'm coming."`);
   S.party.DJ.in = true;
   lines.push(`Nobody invited <b>DJ</b>. DJ is here. He is wearing his hat. ${S.djLoyal >= 2 ? `"Todd found my hat once. I go where Todd goes."` : `"WHERE ARE WE GOING? DOESN'T MATTER. LET'S GO!"`}`);
   if (S.metJon) { S.party.Jon.in = true; lines.push(`<b>Jon Galluzzo</b> jogs up, somehow freshly showered. The power is out, but he is still backlit.`); }
   else { S.jonLate = true; lines.push(`No sign of <b>Jon Galluzzo</b> — Todd never met him. (Maybe you'll run into him downtown.)`); }
   lines.push(S.radioSetup
-    ? `<b>Matt</b> crackles over the ham radio: "Todd, this is Matt. The Wawa on US-1 is lit up like Christmas. I'm heading there now. Meet you by the coffee. Over."`
-    : `Without a ham radio, Todd has no idea where <b>Matt</b> is. (He's fine. He has, like, nine radios.)`);
+    ? `<b>Matt</b> crackles over the ham radio: "Todd, this is Matt. The Wawa on US-1 is lit up like Christmas. I'm heading there now with a few crates of ammo. Also, I need you to know this was NOT an accident. Over."`
+    : `Without a ham radio, Todd has no idea where <b>Matt</b> is. (He's fine. He has nine radios, a bunker under his bunker, and 40,000 rounds of ammo.)`);
   sad();
   say('THE GRID IS DOWN', `${dateStr(PREP_DAYS)}, 6:47 PM.<br><br>The ceiling fan slows. The fridge goes silent. Across St. Augustine, every light blinks out at once — even the Bridge of Lions. Somewhere, a man who just started a load of laundry screams.<br><br>Todd slowly rises from his recliner. He has been waiting for this moment for six years.<br><br>"It's happening."`,
     () => say('Roll Call', lines.join('<br><br>'), trailIntro), 'Gather the crew');
@@ -691,6 +758,7 @@ function passDay(firstLine, resting = false) {
   if (S.weather.hot && S.panelsInstalled < 2 && S.food > 20 && chance(0.15)) { const l = Math.ceil(S.food * 0.15); S.food -= l; log.push(`${l} lb of food spoiled in the heat. (Two or more solar panels would keep the cooler running.)`); }
   if (!S.hat && has('DJ')) log.push('DJ is hatless and visibly wilting.');
   mood(resting ? 6 : -2);
+  if (S.cake > 0 && chance(0.08)) { const n = alexSteals(3); log.push(`<span class="bad">Alex was spotted near the cooler. ${n} slice${n === 1 ? '' : 's'} of white cake missing.</span>`); }
   if (S.cake === 0 && chance(0.3)) { mood(-4); log.push('Todd mentions, again, that there is no white cake.'); }
   S.lastLog = log;
 }
@@ -753,17 +821,18 @@ function eatCake() {
 }
 function rest() {
   passDay('Camped and rested all day.', true);
-  afterDay(() => say('Rest', `The crew rests in the shade of a live oak dripping with Spanish moss. ${has('DJ') ? 'DJ naps with his hat over his face. ' : ''}${has('Jon') ? 'Jon Galluzzo does push-ups for no one. ' : ''}${has('Jennifer') ? 'Jennifer tunes up her bike. ' : ''}Health improves.`, trailHub));
+  afterDay(() => say('Rest', `The crew rests in the shade of a live oak dripping with Spanish moss. ${has('DJ') ? 'DJ naps with his hat over his face. ' : ''}${has('Jon') ? 'Jon Galluzzo does push-ups for no one. ' : ''}${has('Jennifer') ? 'Jennifer, who is very old, naps sitting upright on her bike. ' : ''}Health improves.`, trailHub));
 }
 
 const MATT_TIPS = [
-  `I'm hearing reports of trouble on the road ahead. Stay sharp.`,
+  `I'm hearing reports of trouble on the road ahead. Also: the outage was planned. By who? Exactly.`,
   `A guy on 146.52 says there's a sketchy roadblock somewhere near you. Eyes open.`,
-  `The Wawa is still running. The coffee is hot. Keep moving.`,
-  `Somebody's reporting gators on the move. And hogs. And one very angry swan.`,
+  `The Wawa is still running. Ask yourself why the Wawa is the only one with power. Actually don't. Keep moving.`,
+  `Gators on the move. And hogs. And one very angry swan. The swan is not a swan, Todd.`,
 ];
 function radioMatt() {
   S.radioDay = S.tday; mood(5);
+  if (chance(0.3)) { S.ammo += 40; return say('Radio: Matt', `<i>*kssshhht*</i> "Todd, this is Matt. I buried an ammo cache under the third palm tree past the next stop sign. GPS coordinates are compromised, so I'm telling you by palm tree. Also: the Wawa is the only store with power. Think about that. Over."<br><br>Todd digs. +40 rounds of ammo.`, trailHub); }
   const left = Object.keys(INTEL).filter(k => !S.intel[k]);
   if (left.length && chance(0.5)) { const k = pick(left); S.intel[k] = true; return say('Radio: Matt', `<i>*kssshhht*</i> ${INTEL[k]}`, trailHub); }
   S.tip++;
@@ -823,7 +892,7 @@ const EVENTS = [
   },
   {
     ok: () => has('Jennifer'), bad: true, dodge: `a pothole that would have flattened Jennifer's tire`, run: () => {
-      if (S.bikeParts > 0) { S.bikeParts--; return say('Bike Flat', `Jennifer's front tire pops. She swaps in a new tube in four minutes flat, without stopping her story.`, trailHub); }
+      if (S.bikeParts > 0) { S.bikeParts--; return say('Bike Flat', `Jennifer's front tire pops. She swaps in a new tube in four minutes flat without stopping her story about Eisenhower.`, trailHub); }
       hurt('Jennifer', 10); mood(-5);
       say('Bike Flat', `Jennifer's tire pops and there are no spare tubes. She rides on the rim, sparks flying, muttering things we cannot print.`, trailHub);
     }
@@ -832,7 +901,7 @@ const EVENTS = [
     ok: () => has('DJ') && S.hat, bad: false, run: () => scene({
       title: 'HAT OVERBOARD', text: `A gust of wind snatches DJ's hat clean off his head. It cartwheels down the road toward a storm drain. DJ makes a sound no human should make.`,
       choices: [
-        { label: 'Chase it!', fn: () => { if (chance(S.djLoyal >= 2 ? 0.9 : 0.6)) { mood(10); say('Got It!', `${has('Jennifer') ? 'Jennifer sprints after it on her bike and snags it one-handed. ' : 'Todd dives and catches it inches from the storm drain. '}DJ puts it back on and is instantly himself again.`, trailHub); } else { S.hat = false; mood(-15); say('Gone', `The hat disappears down the storm drain. DJ stares at the grate. He is not okay. <span class="bad">DJ will lose health every day until he finds a new hat.</span>`, trailHub); } } },
+        { label: 'Chase it!', fn: () => { if (chance(S.djLoyal >= 2 ? 0.9 : 0.6)) { mood(10); say('Got It!', `${has('Jennifer') ? 'Jennifer, at roughly age 99, sprints after it on her bike and snags it with her cane. ' : 'Todd dives and catches it inches from the storm drain. '}DJ puts it back on and is instantly himself again.`, trailHub); } else { S.hat = false; mood(-15); say('Gone', `The hat disappears down the storm drain. DJ stares at the grate. He is not okay. <span class="bad">DJ will lose health every day until he finds a new hat.</span>`, trailHub); } } },
         { label: `Let it go. It's just a hat.`, fn: () => { S.hat = false; mood(-15); say('"Just a Hat"', `"JUST A HAT?" DJ is inconsolable. <span class="bad">DJ will lose health every day until he finds a new hat.</span>`, trailHub); } },
       ],
     })
@@ -883,8 +952,53 @@ const EVENTS = [
   { ok: () => true, bad: false, run: () => { S.food += 10; mood(5); say('Stranded Trolley', 'A sightseeing trolley is stranded with a dozen tourists from Ohio who have been on the "history tour" for three days. They trade you trail mix and beef jerky for directions to the Wawa. +10 lb food.', trailHub); } },
   { ok: () => has('DJ'), bad: false, run: () => { if (chance(0.5)) { S.gas += 5; say('DJ Made a Deal', `While everyone slept, DJ traded a bag of Todd's beef jerky for 5 gallons of gas and a boat horn. According to DJ, the boat horn is the real prize. +5 gallons of gas.`, trailHub); } else { const l = Math.min(S.water, 10); S.water -= l; say('DJ Made a Deal', `While everyone slept, DJ traded ${l} gallons of water for a signed photo of a guy who "might be" a Jacksonville Jaguar. DJ is thrilled. Nobody else is.`, trailHub); } } },
   { ok: () => true, bad: true, dodge: 'a fire ant mound', run: () => { const v = pick(active()); hurt(v, 12); say('Fire Ants!', `${FULL[v]} steps directly into a fire ant mound. There is a lot of hopping and yelling. ${v === 'Jon' ? 'Even mid-hop, Jon looks like a cologne ad.' : ''}`, trailHub); } },
-  { ok: () => has('Jennifer'), bad: false, run: () => { const f = R(8, 16); S.food += f; say('Jennifer Scouts Ahead', `Jennifer bikes ahead to scout and comes back with ${f} lb of food in her panniers from a church giveaway. "They had a whole table. I told them about you guys." Bikes: 1, Gas: 0.`, trailHub); } },
+  { ok: () => has('Jennifer'), bad: false, run: () => { const f = R(8, 16); S.food += f; say('Jennifer Scouts Ahead', `Jennifer bikes ahead to scout and comes back with ${f} lb of food from a church giveaway. Half the congregation are her grandchildren. Some are her great-great-grandchildren. Bikes: 1, Gas: 0.`, trailHub); } },
 ];
+
+EVENTS.push(
+  {
+    ok: () => S.cake > 0, bad: false, run: () => {
+      const n = alexSteals(5);
+      scene({
+        title: 'Alex Strikes Again', text: `While everyone was distracted, <b>Alex</b> — radiant, windswept, somehow wearing a sundress in a grid-down emergency — strolled past the Jeep. When she's gone, so are <span class="bad">${n} slice${n === 1 ? '' : 's'} of white cake</span>. She waves from down the road with a fork.`,
+        choices: [
+          { label: 'Chase her!', fn: () => { if (chance(0.25)) { S.cake += n; S.alexStole -= n; mood(10); say('Recovered!', `${has('Jennifer') ? 'Jennifer, who is very old, somehow corners her with her bike. ' : 'Todd somehow corners her. '}Alex hands back the cake with a dazzling smile and zero remorse. "I was just holding it for you."`, trailHub); } else { mood(-5); say('Gone', `Alex vanishes into a crowd of tourists. All that remains is a single footprint in the frosting. <span class="bad">That's a demerit on your final score.</span>`, trailHub); } } },
+          { label: 'Let her go. Nobody can stop Alex.', fn: () => { mood(-3); say('Nobody Can Stop Alex', `Todd watches the cake disappear over the horizon. West's words echo in his head: "Watch out for Alex." <span class="bad">That's a demerit on your final score.</span>`, trailHub); } },
+        ],
+      });
+    }
+  },
+  {
+    ok: () => true, bad: false, run: () => scene({
+      title: 'Eliza at the Crossroads', text: `At an intersection with dead traffic lights stands <b>Eliza</b>, cloak billowing, arranging crystals on the hood of an abandoned Corolla. "Oh good, it's you," she says. "I'm very open-minded about who I help."`,
+      choices: [
+        { label: 'Ask her to read your palm', fn: () => { S.tip++; say('Your Palm', `"You have a long life line, a short cake line, and someone named Alex in your future. Avoid her." <span class="hl">You'll dodge the next bit of trouble.</span> "I'm very open-minded, but that woman is a menace."`, trailHub); } },
+        { label: 'Accept her herbal poultice', fn: () => { healAll(15); say('Mysterious Healing', `It smells like swamp and lavender. It works anyway. Everyone feels better. "I'm very open-minded about medicine," Eliza says, which is not reassuring.`, trailHub); } },
+        { label: 'Let her bless the Jeep', fn: () => { S.gas += 2; mood(5); say('Blessed', `Eliza chants, rings a tiny bell and taps the hood three times. The gas gauge rises. Todd checks: +2 gallons. Science cannot explain it. "I'm very open-minded about science," she says.`, trailHub); } },
+      ],
+    })
+  },
+  {
+    ok: () => true, bad: false, run: () => scene({
+      title: 'West Under the Live Oak', text: `Under a live oak dripping with Spanish moss sits <b>West</b>, the wise man, as if he's been waiting. He probably has. "Sit," he says. "One question."`,
+      choices: [
+        { label: '"How do we get there alive?"', fn: () => { healAll(10); mood(10); say('West Speaks', `"Slow is smooth. Smooth is fast. Water before food. Food before cake." He pauses. "Cake before despair." Everyone feels steadier.`, trailHub); } },
+        { label: '"What lies ahead?"', fn: () => { S.tip++; say('West Speaks', `West draws a line in the sand with a stick, then a lion, then a gator. "Patience at the lion. Courage at the gator." <span class="hl">You'll dodge the next bit of trouble.</span>`, trailHub); } },
+        { label: '"Is Matt right about the birds?"', fn: () => { mood(15); say('West Speaks', `West is quiet for a very long time. A pelican flies overhead. West watches it go. "...Next question." Everyone laughs, a little nervously.`, trailHub); } },
+      ],
+    })
+  },
+  {
+    ok: () => true, bad: false, run: () => scene({
+      title: 'A Black Sedan', text: `A black sedan with tinted windows — the only car on the road with a full tank — pulls alongside. The window lowers. It's <b>Kelsey</b>, in sunglasses, holding a satellite phone. "Comrades! I mean... neighbors. You need gas, da? I need... cake. For reasons."`,
+      choices: [
+        { label: 'Trade 3 slices of cake for 8 gallons of gas', disabled: S.cake < 3, fn: () => { S.cake -= 3; S.gas += 8; say('Deal, Comrade', `Kelsey siphons 8 gallons into the Jeep with alarming professionalism. She photographs the cake before eating it. "For the file." +8 gallons of gas.`, trailHub); } },
+        { label: 'Interrogate her', fn: () => { if (radioPowered()) { mood(10); S.ammo += 15; say('Matt on the Line', `Todd keys the radio. Matt's voice: "ASK HER ABOUT THE SQUIRREL." Kelsey's eye twitches. She tosses a box of ammo onto the seat — "this conversation did not happen" — and speeds off. +15 rounds.`, trailHub); } else { say('Nyet', `"I am simple girl from O-hee-yo," Kelsey says, and drives away at 90 mph without headlights.`, trailHub); } } },
+        { label: 'Trust her and let her ride along for a mile', fn: () => { if (chance(0.5)) { S.food += 20; say('Surprisingly Helpful', `Kelsey leads you to an unmarked warehouse full of canned goods labeled only with serial numbers. "Is not my warehouse." +20 lb food.`, trailHub); } else { const l = Math.min(S.ammo, 20); S.ammo -= l; say('Do Svidaniya', `At a stop sign, Kelsey vanishes — along with ${l} rounds of ammo. She leaves a note: "Thank you for cooperation. — K." Matt is going to be insufferable about this.`, trailHub); } } },
+      ],
+    })
+  },
+);
 
 function randomEvent() {
   const opts = EVENTS.map((e, i) => ({ e, i })).filter(x => x.e.ok() && x.i !== S.lastEvent);
@@ -1222,6 +1336,8 @@ function bike(ctx, x, y, t, moving) {
   rect(ctx, '#ff6fae', x + 7, y + 1, 3, 6);
   rect(ctx, '#e0b08a', x + 8, y - 3, 3, 3);
   rect(ctx, '#ffcc00', x + 7, y - 4, 5, 2);
+  rect(ctx, '#f2f2f2', x + 6, y - 2, 2, 4); rect(ctx, '#f2f2f2', x + 7, y + 1, 1, 2); // white hair (Jennifer is very old)
+  rect(ctx, '#bbb', x + 12, y - 2, 1, 1);
   rect(ctx, '#e0b08a', x + 10, y + 2, 4, 1);
   rect(ctx, '#334', x + 8, y + 7, 1, p ? 4 : 2); rect(ctx, '#334', x + 9, y + 7, 1, p ? 2 : 4);
   rect(ctx, '#8b5a2b', x - 1, y + 5, 5, 3);
@@ -1290,12 +1406,12 @@ function supplies(back) {
   const rows = [['Cash', '$' + fmt(S.money)], ['Water', fmt(S.water) + ' gallons'], ['Food', fmt(S.food) + ' lb'], ['White cake', S.cake + ' slices'],
   ['Ammo', S.ammo + ' rounds'], ['Gas', S.gas + ' gallons'], ['First-aid kits', S.meds],
   ['Solar panels', `${S.panelsInstalled} installed${S.panels > S.panelsInstalled ? ` (+${S.panels - S.panelsInstalled} not installed)` : ''}`],
-  ['Battery banks', S.batteries], ['Spare tires', S.spareTire], ['Rain barrel', S.rainBarrel ? 'yes' : 'no'], ['Bug spray', S.bugSpray], ['Bike parts', S.bikeParts]];
+  ['Battery banks', S.batteries], ['Spare tires', S.spareTire], ['Rain barrel', S.rainBarrel ? 'yes' : 'no'], ['Bug spray', S.bugSpray], ['Bike parts', S.bikeParts], ['Cake stolen by Alex', `${S.alexStole || 0} slices${S.cakeSafe ? ' (cake is in the gun safe)' : ''}`]];
   let crew;
   if (S.phase === 'prep') {
     crew = [
       ['Kirsten', kirstenHint()],
-      ['Jennifer', S.jenn ? `Bike days together: ${S.jenn}` : `Hasn't been on a bike day yet`],
+      ['Jennifer', (S.jenn ? `Bike days together: ${S.jenn}` : `Hasn't been on a bike day yet`) + ' · age: very old'],
       ['DJ', S.djLoyal >= 2 ? 'Fiercely loyal (you found his hat)' : `Shifts worked: ${S.djShifts}`],
       ['Jon Galluzzo', S.metJon ? 'In! (10% off at stores)' : 'Never met. (Try the range or the office.)'],
       ['Matt', S.radioSetup ? 'On the ham radio' : 'No radio set up yet'],
@@ -1321,11 +1437,12 @@ function wawa() {
   S.phase = 'end'; clearSave(); fanfare();
   let t = `You see it before anything else: the red-and-yellow glow of the Wawa sign, humming on generator power, the only lit thing for miles. The parking lot is full of neighbors, lawn chairs and coolers. Someone has a grill going. Someone else is playing Jimmy Buffett. It smells like coffee and hoagies.<br><br>`;
   t += S.radioSetup
-    ? `By the coffee station, a man holding three handheld radios turns around. It's <b>Matt</b>. "Todd. This is Matt. I can see you. Over." Todd hugs him. Matt quietly says "over" one more time.<br><br>`
+    ? `By the coffee station, a man holding three handheld radios and sitting on four crates of ammo turns around. It's <b>Matt</b>. "Todd. This is Matt. I can see you. Over." Todd hugs him. Matt whispers, "The squirrel story is a cover-up," then quietly says "over" one more time.<br><br>`
     : `By the coffee station, Todd spots <b>Matt</b>, who has been here since hour one. "Tried to radio you," Matt says. "You really need a ham radio, Todd."<br><br>`;
   if (has('DJ')) t += `DJ orders fourteen hoagies "for the team" and puts them on a company card. ${S.hat ? 'His hat never left his head.' : ''} `;
   if (has('Jon')) t += 'Jon Galluzzo is immediately surrounded by grateful townspeople. He hands out coffee. He looks incredible. ';
-  if (has('Jennifer')) t += `Jennifer locks her bike to the air pump and declares it "honestly, a great ride." `;
+  if (has('Jennifer')) t += `Jennifer, who is very old, locks her bike to the air pump and says it was "nothing compared to the winter of '51." `;
+  t += `<br><br>Everyone's here. <b>Eliza</b> is reading palms by the ice machine and telling strangers she's very open-minded. <b>West</b> sits on a cooler, dispensing wisdom and hoagie recommendations. <b>Kelsey</b> is photographing the generator "for her scrapbook." And <b>Alex</b> is standing next to the empty bakery case with frosting on her lip, looking absolutely radiant and completely innocent.`;
   if (has('Kirsten')) t += `<br><br>Kirsten leans on Todd's shoulder. "You were right," she says. "Don't let it go to your head."`;
   say('YOU MADE IT TO THE WAWA!', t, scoreScreen, 'See your score');
 }
@@ -1342,8 +1459,9 @@ function computeScore() {
   rows.push([`$${fmt(S.money)} cash`, Math.floor(S.money / 5)]);
   rows.push([`Morale: ${moraleWord()}`, S.morale * 3]);
   rows.push([`${S.tday} days on the trail`, Math.max(0, (24 - S.tday) * 25)]);
+  if (S.alexStole > 0) rows.push([`<span class="bad">DEMERIT: ${S.alexStole} slice${S.alexStole === 1 ? '' : 's'} of cake stolen by Alex</span>`, -S.alexStole * 20]);
   const sub = rows.reduce((t, r) => t + r[1], 0);
-  const total = Math.round(sub * S.scoreMult);
+  const total = Math.max(0, Math.round(sub * S.scoreMult));
   let rank = RANKS[0][1]; RANKS.forEach(([min, nm]) => { if (total >= min) rank = nm; });
   return { rows, sub, total, rank };
 }
@@ -1366,14 +1484,17 @@ function scoreScreen() {
 }
 
 function epilogue() {
-  say('Epilogue', `Three days later, the power came back on.<br><br>The utility company traced the outage to a single squirrel in a transformer. The squirrel is fine. The squirrel has been named Employee of the Month by no one.<br><br>Todd stood in the Wawa parking lot as the streetlights flickered back on, one by one, all along US-1. ${has('Kirsten') ? 'Kirsten squeezed his hand. ' : ''}${has('DJ') ? 'DJ honked a boat horn. ' : ''}Somewhere, Matt said "over."<br><br>Todd looked down at ${S.cake ? 'his last slice of white cake' : 'the empty cake box'}.<br><br>"Next time," he whispered, "I'm going to need more cake."<br><br><span class="hl">THE END</span>`, () => hallOfFame(title), 'See the Hall of Fame');
+  say('Epilogue', `Three days later, the power came back on.<br><br>The utility company traced the outage to a single squirrel in a transformer. The squirrel is fine. The squirrel has been named Employee of the Month by no one.<br><br>Todd stood in the Wawa parking lot as the streetlights flickered back on, one by one, all along US-1. ${has('Kirsten') ? 'Kirsten squeezed his hand. ' : ''}${has('DJ') ? 'DJ honked a boat horn. ' : ''}West nodded slowly. Eliza said she was very open-minded about the squirrel theory. Kelsey quietly deleted something from her phone. Somewhere, Matt said "it wasn't a squirrel," and then "over."<br><br>Todd looked down at ${S.cake ? 'his last slice of white cake' : 'the empty cake box'}.<br><br>"Next time," he whispered, "I'm going to need more cake."<br><br><span class="hl">THE END</span>`, () => hallOfFame(title), 'See the Hall of Fame');
 }
 
 /* ---- Hall of Fame ---- */
 const HOF_SEED = [
-  { n: 'Matt (via ham radio)', s: 7400, r: 'Solar-Powered Sergeant' },
+  { n: 'Matt (40,000 rounds)', s: 7400, r: 'Solar-Powered Sergeant' },
   { n: `DJ's Hat`, s: 5100, r: 'Captain of Canned Goods' },
+  { n: 'West', s: 6200, r: 'Solar-Powered Sergeant' },
+  { n: 'Kelsey (from "Ohio")', s: 4100, r: 'Captain of Canned Goods' },
   { n: 'Captain Ray', s: 3300, r: 'Lieutenant of Lunchables' },
+  { n: 'Alex (score is all stolen cake)', s: 2600, r: 'Lieutenant of Lunchables' },
   { n: 'Brenda from the HOA', s: 1200, r: 'Grid-Down Greenhorn' },
   { n: 'The Squirrel', s: 900, r: 'Grid-Down Greenhorn' },
 ];
