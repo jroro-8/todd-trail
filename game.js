@@ -1366,7 +1366,7 @@ function scoreScreen() {
 }
 
 function epilogue() {
-  say('Epilogue', `Three days later, the power came back on.<br><br>The utility company traced the outage to a single squirrel in a transformer. The squirrel is fine. The squirrel has been named Employee of the Month by no one.<br><br>Todd stood in the Wawa parking lot as the streetlights flickered back on, one by one, all along US-1. Kirsten squeezed his hand. DJ honked a boat horn. Somewhere, Matt said "over."<br><br>Todd looked down at his last slice of white cake.<br><br>"Next time," he whispered, "I'm going to need more cake."<br><br><span class="hl">THE END</span>`, () => hallOfFame(title), 'See the Hall of Fame');
+  say('Epilogue', `Three days later, the power came back on.<br><br>The utility company traced the outage to a single squirrel in a transformer. The squirrel is fine. The squirrel has been named Employee of the Month by no one.<br><br>Todd stood in the Wawa parking lot as the streetlights flickered back on, one by one, all along US-1. ${has('Kirsten') ? 'Kirsten squeezed his hand. ' : ''}${has('DJ') ? 'DJ honked a boat horn. ' : ''}Somewhere, Matt said "over."<br><br>Todd looked down at ${S.cake ? 'his last slice of white cake' : 'the empty cake box'}.<br><br>"Next time," he whispered, "I'm going to need more cake."<br><br><span class="hl">THE END</span>`, () => hallOfFame(title), 'See the Hall of Fame');
 }
 
 /* ---- Hall of Fame ---- */
