@@ -171,7 +171,7 @@ function title() {
   S = null; busy = false;
   const saved = loadSave();
   scene({
-    extra: `<div class="logo"><div class="logo-top">THE</div><div class="logo-main">TODD TRAIL</div><div class="logo-sub">A St. Augustine Survival Adventure</div></div><img class="marquee" src="marquee.jpg" alt="DJ &amp; Lindsey Real Estate marquee sign reading HONEY POT!"><canvas id="titleCanvas" class="scenecv" width="320" height="100"></canvas>`,
+    extra: `<div class="logo"><div class="logo-top">THE</div><div class="logo-main">TODD TRAIL</div><div class="logo-sub">A St. Augustine Survival Adventure</div></div><canvas id="titleCanvas" class="scenecv" width="320" height="100"></canvas>`,
     text: `<br>Todd knows something the rest of us don't: <b>the grid is going down.</b> He has 14 days to prep — water, food, ammo, solar panels, and as much white cake as one man can store — before he leads his crew across St. Augustine to the last lit sign in town.<br><br>You may:`,
     choices: [
       { label: 'Travel the trail', fn: chooseBackground },
@@ -1234,6 +1234,8 @@ function endHunt() {
    ============================================================ */
 const hash = n => (((n * 2654435761) >>> 0) % 997);
 let animHandle = null;
+const marqueeImg = new Image();
+marqueeImg.src = 'marquee-sign.png';
 
 function animateScene(id, moving, duration, done) {
   const cv = document.getElementById(id);
@@ -1287,6 +1289,8 @@ function drawScene(ctx, off, t, moving) {
   rect(ctx, '#d9c48a', 0, 90, 320, 10);
   // palms
   for (let i = 0; i < 6; i++) { const px = ((i * 71 - off) % 426 + 426) % 426 - 50; palm(ctx, px, 68, 1); }
+  // DJ & Lindsey marquee on the side of the road (title screen)
+  if (title) roadsideSign(ctx, 10, 1);
   // party
   const showBike = !title && has('Jennifer');
   const bob = moving && Math.floor(t / 110) % 2 ? 1 : 0;
@@ -1296,6 +1300,15 @@ function drawScene(ctx, off, t, moving) {
 }
 
 /* Todd's black Jeep Gladiator: boxy cab, flat hood, square fenders, 7-slot grille, round headlights, pickup bed */
+function roadsideSign(ctx, x, y) {
+  const w = 98, h = 60;
+  rect(ctx, '#2a2a2a', x + 18, y + h, 4, 69 - y - h); rect(ctx, '#2a2a2a', x + w - 22, y + h, 4, 69 - y - h);
+  rect(ctx, '#1a1a1a', x - 1, y - 1, w + 2, h + 2);
+  if (marqueeImg.complete && marqueeImg.naturalWidth) { ctx.imageSmoothingEnabled = true; ctx.drawImage(marqueeImg, x, y, w, h); ctx.imageSmoothingEnabled = false; }
+  else rect(ctx, '#eee', x, y, w, h);
+  rect(ctx, '#3f7a3a', x + 10, 66, 30, 4); rect(ctx, '#4f9a45', x + 44, 66, 30, 4);
+}
+
 function truck(ctx, x, y, t, moving) {
   const body = '#1c1c1f', hi = '#3a3a40', trim = '#0b0b0c';
   // bed

@@ -48,4 +48,3 @@ table.score tr.total td{color:var(--green);border-top:2px solid var(--green);bor
 input.name{font:inherit;background:#000;color:var(--green);border:2px solid var(--green);padding:4px 8px;width:100%;max-width:320px;margin-top:6px}
 footer{text-align:center;color:#3f4f3f;font-size:16px;padding:8px}
 @media (max-width:560px){html,body{font-size:21px}h2{font-size:12px}.status{font-size:18px}}
-.marquee{display:block;width:100%;max-width:520px;margin:0 auto 16px;border:2px solid var(--line);image-rendering:auto}
