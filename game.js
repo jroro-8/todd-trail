@@ -64,7 +64,7 @@ const AILMENTS = [
 const LEAVE = {
   Kirsten: `Kirsten has had ENOUGH. She flags down her cousin's pontoon boat and heads for her mom's place in Palm Coast. "Call me when the lights are back on, Todd."`,
   Jennifer: `Jennifer, who is somewhere between 94 and 107 depending on who you ask, announces it is past her bedtime. She clips in and pedals home at a steady 6 mph. She'll be fine. She survived the Spanish flu.`,
-  DJ: `DJ flags down a passing airboat, yells "I'LL SEE YOU AT THE OFFICE!" and is gone. His hat is the last thing you see.`,
+  DJ: `DJ flags down a passing airboat, yells "I'LL SEE YOU AT DJ & LINDSEY!" and is gone. His hat is the last thing you see.`,
   Jon: `Jon Galluzzo is too exhausted to keep looking this good. He retreats to a friend's porch to recover. (He still looks great.)`,
 };
 
@@ -171,7 +171,7 @@ function title() {
   S = null; busy = false;
   const saved = loadSave();
   scene({
-    extra: `<div class="logo"><div class="logo-top">THE</div><div class="logo-main">TODD TRAIL</div><div class="logo-sub">A St. Augustine Survival Adventure</div></div><canvas id="titleCanvas" class="scenecv" width="320" height="100"></canvas>`,
+    extra: `<div class="logo"><div class="logo-top">THE</div><div class="logo-main">TODD TRAIL</div><div class="logo-sub">A St. Augustine Survival Adventure</div></div><img class="marquee" src="marquee.jpg" alt="DJ &amp; Lindsey Real Estate marquee sign reading HONEY POT!"><canvas id="titleCanvas" class="scenecv" width="320" height="100"></canvas>`,
     text: `<br>Todd knows something the rest of us don't: <b>the grid is going down.</b> He has 14 days to prep — water, food, ammo, solar panels, and as much white cake as one man can store — before he leads his crew across St. Augustine to the last lit sign in town.<br><br>You may:`,
     choices: [
       { label: 'Travel the trail', fn: chooseBackground },
@@ -230,7 +230,7 @@ function prepHub() {
     title: `Day ${S.day} — ${left} day${left > 1 ? 's' : ''} until the grid goes down`,
     text: `<i>(according to Todd)</i><br>${pick(PREP_FLAVOR)}<br><br>What will Todd do today?`,
     choices: [
-      { label: 'Work a shift at the office', note: '(DJ pays cash)', fn: workShift },
+      { label: 'Work a shift at DJ & Lindsey', note: '(DJ pays cash)', fn: workShift },
       { label: 'Shop at Publix', note: '(water, food, WHITE CAKE)', fn: () => store('publix') },
       { label: 'Shop at Home Depot', note: '(solar, gas, batteries)', fn: () => store('depot') },
       { label: 'Shop at Ancient City Arms & Ammo', note: '(ammo)', fn: () => store('guns') },
@@ -259,7 +259,7 @@ function workShift() {
   const pay = 150;
   const variants = [
     () => scene({
-      title: 'The Office', text: `Todd clocks in. At 9:04 AM, DJ kicks the door open wearing a brand-new hat. "TODD! BIG DAY! HUGE DAY!" Nobody knows why it's a big day. It's never clear.`,
+      title: 'DJ & Lindsey HQ', text: `Todd clocks in at DJ & Lindsey Real Estate. At 9:04 AM, DJ kicks the door open wearing a brand-new hat. "TODD! BIG DAY! HUGE DAY!" Nobody knows why it's a big day. It's never clear.`,
       choices: [
         { label: 'Hustle all day', note: `(+$${pay + 50})`, fn: () => { S.money += pay + 50; mood(-5); outcome('The Grind', `Todd works like a machine. DJ yells "THAT'S WHAT I'M TALKING ABOUT" eleven times. +$${pay + 50}.`); } },
         { label: 'Tell DJ the grid is going down', fn: () => { S.money += pay; if (chance(0.55)) { S.money += 100; S.djLoyal++; outcome('DJ Is In', `DJ's eyes go wide. "Todd. TODD. I've been SAYING this." He pulls $100 cash out of his hat. "Prepping bonus." +$${pay + 100}.`); } else { mood(-5); outcome('DJ Laughs', `DJ laughs so hard his hat falls off. He picks it up, puts it back on, and laughs again. +$${pay}.`); } } },
@@ -270,17 +270,17 @@ function workShift() {
       title: 'Team Building', text: 'DJ has announced a mandatory team-building exercise: paddleboarding on the Intracoastal. In hats. DJ will be wearing two hats.',
       choices: [
         { label: `Go — it's basically survival training`, fn: () => { S.money += pay; mood(10); hurt('Todd', 5); outcome('Paddle Prepper', `Todd falls in twice but discovers he can paddle a mile while holding a cooler. Valuable skill. +$${pay}.`); } },
-        { label: 'Stay at your desk working on the bug-out spreadsheet', fn: () => { S.money += pay; S.food += 5; outcome('Spreadsheet Hero', `The spreadsheet now has 14 tabs. Todd finds a canned-goods coupon in tab 9. +$${pay}, +5 lb food.`); } },
+        { label: 'Stay at your desk and vibe-code a bug-out app', fn: () => { S.money += pay; S.food += 5; outcome('Ship It', `Todd builds an app that tracks every can of beans in his house. It has a dark mode. The spreadsheet behind it has 14 tabs. Todd finds a canned-goods coupon in tab 9. +$${pay}, +5 lb food.`); } },
       ],
     }),
     () => {
       S.money += pay;
       if (!S.metJon) {
         S.metJon = true;
-        outcome('A Visitor', `Around 2 PM the whole office goes quiet. Someone has walked in. Strong jaw. Great hair. Somehow lit from slightly above at all times.<br><br>"Jon Galluzzo," he says, shaking Todd's hand. Todd hears a faint choir.<br><br>Todd tells Jon about the grid. Jon nods thoughtfully. "I'm in. I look great by candlelight."<br><br><b>Jon Galluzzo will join your crew.</b> +$${pay}.`);
+        outcome('A Visitor', `Around 2 PM the whole DJ & Lindsey office goes quiet. Even the keyboards stop. Someone has walked in. Strong jaw. Great hair. Somehow lit from slightly above at all times.<br><br>"Jon Galluzzo," he says, shaking Todd's hand. Todd hears a faint choir.<br><br>Todd tells Jon about the grid. Jon nods thoughtfully. "I'm in. I look great by candlelight."<br><br><b>Jon Galluzzo will join your crew.</b> +$${pay}.`);
       } else {
         S.money += 25;
-        outcome('Normal Day', `A normal day at the office. DJ wore a hat. Matt explained that Publix knows something. Jennifer, who is very, very old, biked in at 5 AM and has already done a crossword in pen. +$${pay + 25}.`);
+        outcome('Normal Day', `A normal day at DJ & Lindsey. Everyone pushed code to production on a Friday. DJ wore a hat. Matt explained that Publix knows something. Jennifer, who is very, very old, biked in at 5 AM and has already done a crossword in pen. +$${pay + 25}.`);
       }
     },
     () => scene({
@@ -1439,7 +1439,7 @@ function wawa() {
   t += S.radioSetup
     ? `By the coffee station, a man holding three handheld radios and sitting on four crates of ammo turns around. It's <b>Matt</b>. "Todd. This is Matt. I can see you. Over." Todd hugs him. Matt whispers, "The squirrel story is a cover-up," then quietly says "over" one more time.<br><br>`
     : `By the coffee station, Todd spots <b>Matt</b>, who has been here since hour one. "Tried to radio you," Matt says. "You really need a ham radio, Todd."<br><br>`;
-  if (has('DJ')) t += `DJ orders fourteen hoagies "for the team" and puts them on a company card. ${S.hat ? 'His hat never left his head.' : ''} `;
+  if (has('DJ')) t += `DJ orders fourteen hoagies "for the DJ & Lindsey team" and puts them on the company card. ${S.hat ? 'His hat never left his head.' : ''} `;
   if (has('Jon')) t += 'Jon Galluzzo is immediately surrounded by grateful townspeople. He hands out coffee. He looks incredible. ';
   if (has('Jennifer')) t += `Jennifer, who is very old, locks her bike to the air pump and says it was "nothing compared to the winter of '51." `;
   t += `<br><br>Everyone's here. <b>Eliza</b> is reading palms by the ice machine and telling strangers she's very open-minded. <b>West</b> sits on a cooler, dispensing wisdom and hoagie recommendations. <b>Kelsey</b> is photographing the generator "for her scrapbook." And <b>Alex</b> is standing next to the empty bakery case with frosting on her lip, looking absolutely radiant and completely innocent.`;
