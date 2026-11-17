@@ -218,6 +218,9 @@ const PREP_FLAVOR = [
   'Todd tells the mail carrier to "stay safe out there." The mail carrier is confused.',
   'Todd re-labels every jug in the garage with the date and his initials. Twice.',
   'A peacock is standing on Todd\'s Jeep Gladiator. Todd takes it as an omen.',
+  'Todd stares out the window at the pool he dug himself. It has been "almost done" since 2023. A frog lives there now. Todd has named him Gerald.',
+  'Kirsten asks when the pool will be finished. Todd says "after the grid goes down." Kirsten does not understand the answer.',
+  'Todd measures the hole in the backyard again. Still a hole. Still his.',
 ];
 
 function prepHub() {
@@ -240,6 +243,7 @@ function prepHub() {
       { label: 'Date night with Kirsten', fn: dateNight },
       { label: 'Bike day with Jennifer', fn: bikeDay },
       { label: 'Fill every container with water', fn: waterDay },
+      { label: 'Work on the unfinished pool', note: S.poolCistern ? '(now a cistern)' : '(dug it himself)', fn: poolDay },
       { label: 'Check supplies & crew', note: '(free)', fn: () => supplies(prepHub) },
     ],
   });
@@ -460,7 +464,7 @@ function hamRadio() {
 /* ---- Kirsten ---- */
 function kirstenHint() {
   const k = S.kirsten;
-  return k >= 70 ? 'Things are great between them.' : k >= 40 ? 'Things are... fine. Mostly.' : k >= 25 ? 'She has started saying "Todd." in a very flat voice.' : 'She has started looking at apartments in Palm Coast.';
+  return k >= 70 ? 'Things are great between them.' : k >= 40 ? 'Things are... fine. Mostly. She has asked about the pool 41 times.' : k >= 25 ? 'She has started saying "Todd." in a very flat voice.' : 'She has started looking at apartments in Palm Coast.';
 }
 function dateNight() {
   scene({
@@ -488,6 +492,20 @@ function bikeDay() {
       { label: 'Water purification', note: S.purify ? '(already learned)' : '', disabled: S.purify, fn: () => { S.purify = true; outcome('Clean Water', `Jennifer builds a filter out of a handkerchief, sand, charcoal and "what we did in the war" — then boils everything to be safe. "Never drink creek water straight, Todd." <b>She can now stretch your water on the trail.</b>`); } },
       { label: 'Buy spare bike parts from her stash ($30)', disabled: S.money < 30, fn: () => { S.money -= 30; S.bikeParts += 2; outcome('Parts Department', 'Two tubes, a chain link and a brass bell older than Todd\'s parents. +2 bike parts.'); } },
       { label: 'Ride with her to Vilano Beach and back', fn: () => { mood(15); hurt('Todd', 5); outcome('Leg Day', 'Twenty miles. Jennifer, who is very old, chats the whole way and still drops Todd on the bridge. Todd can no longer feel his thighs. But the bridge at sunrise? Unreal. Morale way up.'); } },
+    ],
+  });
+}
+
+/* ---- The unfinished pool ---- */
+function poolDay() {
+  scene({
+    title: 'The Unfinished Pool',
+    text: `In Todd's backyard is a pool. Technically, it is a hole. Todd dug it himself, by hand, starting in 2023, after watching one video. It is 4 feet deep at one end, 7 at the other, and 100% unfinished. It currently contains rainwater, leaves and a frog named Gerald.<br><br>${S.poolCistern ? 'It is lined with tarps now and collecting rainwater. Todd is very proud of it.' : 'Kirsten refers to it as "the Situation."'} What will Todd do with it today?`,
+    choices: [
+      { label: 'Line it with tarps — turn it into an emergency rainwater cistern ($40)', disabled: S.poolCistern || S.money < 40, note: S.poolCistern ? '(done)' : '', fn: () => { S.money -= 40; S.poolCistern = true; mood(10); S.kirsten -= 5; outcome('The Cistern', `Todd lines the hole with blue tarps and sandbags. It is not a pool. It is a <b>strategic water reserve</b>. When the grid goes down, it'll be full of rainwater. Gerald the frog is allowed to stay. Kirsten says it "looks like a crime scene."${S.bugSpray ? '' : ' The mosquitoes are thrilled.'}`); } },
+      { label: 'Dig deeper ("it\'s basically a bunker")', fn: () => { hurt('Todd', 10); mood(5); const r = R(1, 3); if (r === 1) { S.money += 60; outcome('Buried Treasure', 'Three feet down, Todd hits a rusty coffee can. Inside: $60 in old bills and a 1987 Gators ticket stub. +$60. Todd is now convinced the pool is lucky.'); } else if (r === 2) { outcome('Sprinkler Line', 'Todd hits the sprinkler line. Geyser! The pool is now 30% fuller and 0% more finished. Kirsten watches from the window, sipping coffee, saying nothing. Very loudly.'); } else { mood(10); outcome('Deeper', 'Todd digs for six hours. The pool is now 7 feet 4 inches at the deep end. He takes a selfie in the hole. He sends it to Matt. Matt replies: "They can\'t see you down there. Good."'); } } },
+      { label: 'Throw a "pool party" anyway (2 slices of cake)', disabled: S.cake < 2, fn: () => { S.cake -= 2; mood(15); S.kirsten += 10; S.djLoyal++; outcome('Pool Party', 'Todd throws a pool party at a pool that does not exist. DJ shows up in a hat and swim trunks and cannonballs into four inches of water. Eliza blesses the hole. West says, "A man is not measured by his pool." Kirsten laughs so hard she forgives Todd for the whole thing. Morale way up.'); } },
+      { label: 'Never mind', fn: prepHub },
     ],
   });
 }
@@ -584,6 +602,11 @@ function kelseyPrep() {
   });
 }
 
+NIGHT.push(
+  { ok: () => true, run: () => { mood(5); S.djLoyal++; say('Splash', `At 11 PM, DJ stops by "to see the pool" and walks straight into it in the dark. He emerges from four feet of rainwater holding Gerald the frog. His hat is still dry. Nobody knows how. "Todd," he says, dripping, "this is a GREAT pool."`, prepHub); } },
+  { ok: () => true, run: () => say('Aerial Surveillance', `Todd spots Kelsey on her roof at 2 AM, photographing his backyard pool with a long lens. The next morning there's a note in his mailbox: "Is missile silo, da?" Matt is going to love this.`, prepHub) },
+);
+
 function nightEvent() { pick(NIGHT.filter(e => e.ok())).run(); }
 
 function kirstenFindsCans() {
@@ -655,6 +678,8 @@ function gridDown() {
   lines.push(S.radioSetup
     ? `<b>Matt</b> crackles over the ham radio: "Todd, this is Matt. The Wawa on US-1 is lit up like Christmas. I'm heading there now with a few crates of ammo. Also, I need you to know this was NOT an accident. Over."`
     : `Without a ham radio, Todd has no idea where <b>Matt</b> is. (He's fine. He has nine radios, a bunker under his bunker, and 40,000 rounds of ammo.)`);
+  if (S.poolCistern) { const g = 30 + (S.purify ? 15 : 0); S.water += g; lines.push(`The backyard <b>pool</b> — still unfinished, but lined with tarps — is full of rainwater. ${S.purify ? 'Jennifer filters it the old-fashioned way. ' : ''}Todd pumps ${g} gallons into jugs. "WHO'S LAUGHING NOW, KIRSTEN?" (Kirsten is not laughing.) +${g} gallons of water.`); }
+  else lines.push(`Todd looks at the unfinished <b>pool</b> in the backyard one last time. It contains four inches of rainwater and Gerald the frog. Gerald will hold the fort.`);
   sad();
   say('THE GRID IS DOWN', `${dateStr(PREP_DAYS)}, 6:47 PM.<br><br>The ceiling fan slows. The fridge goes silent. Across St. Augustine, every light blinks out at once — even the Bridge of Lions. Somewhere, a man who just started a load of laundry screams.<br><br>Todd slowly rises from his recliner. He has been waiting for this moment for six years.<br><br>"It's happening."`,
     () => say('Roll Call', lines.join('<br><br>'), trailIntro), 'Gather the crew');
@@ -1497,7 +1522,7 @@ function scoreScreen() {
 }
 
 function epilogue() {
-  say('Epilogue', `Three days later, the power came back on.<br><br>The utility company traced the outage to a single squirrel in a transformer. The squirrel is fine. The squirrel has been named Employee of the Month by no one.<br><br>Todd stood in the Wawa parking lot as the streetlights flickered back on, one by one, all along US-1. ${has('Kirsten') ? 'Kirsten squeezed his hand. ' : ''}${has('DJ') ? 'DJ honked a boat horn. ' : ''}West nodded slowly. Eliza said she was very open-minded about the squirrel theory. Kelsey quietly deleted something from her phone. Somewhere, Matt said "it wasn't a squirrel," and then "over."<br><br>Todd looked down at ${S.cake ? 'his last slice of white cake' : 'the empty cake box'}.<br><br>"Next time," he whispered, "I'm going to need more cake."<br><br><span class="hl">THE END</span>`, () => hallOfFame(title), 'See the Hall of Fame');
+  say('Epilogue', `Three days later, the power came back on.<br><br>The utility company traced the outage to a single squirrel in a transformer. The squirrel is fine. The squirrel has been named Employee of the Month by no one.<br><br>Todd stood in the Wawa parking lot as the streetlights flickered back on, one by one, all along US-1. ${has('Kirsten') ? 'Kirsten squeezed his hand. ' : ''}${has('DJ') ? 'DJ honked a boat horn. ' : ''}West nodded slowly. Eliza said she was very open-minded about the squirrel theory. Kelsey quietly deleted something from her phone. Somewhere, Matt said "it wasn't a squirrel," and then "over."<br><br>When Todd finally got home, he stood at the edge of his unfinished pool. Gerald the frog looked up at him. "Next summer," Todd said. Gerald did not believe him either.<br><br>Todd looked down at ${S.cake ? 'his last slice of white cake' : 'the empty cake box'}.<br><br>"Next time," he whispered, "I'm going to need more cake."<br><br><span class="hl">THE END</span>`, () => hallOfFame(title), 'See the Hall of Fame');
 }
 
 /* ---- Hall of Fame ---- */
@@ -1510,6 +1535,7 @@ const HOF_SEED = [
   { n: 'Alex (score is all stolen cake)', s: 2600, r: 'Lieutenant of Lunchables' },
   { n: 'Brenda from the HOA', s: 1200, r: 'Grid-Down Greenhorn' },
   { n: 'The Squirrel', s: 900, r: 'Grid-Down Greenhorn' },
+  { n: 'Gerald (lives in the pool)', s: 650, r: 'Grid-Down Greenhorn' },
 ];
 function getHof() { try { const t = localStorage.getItem(HOF_KEY); return t ? JSON.parse(t) : HOF_SEED.slice(); } catch (e) { return HOF_SEED.slice(); } }
 function addHof(n, s, r) { const h = getHof(); h.push({ n, s, r }); h.sort((a, b) => b.s - a.s); try { localStorage.setItem(HOF_KEY, JSON.stringify(h.slice(0, 10))); } catch (e) { } }
